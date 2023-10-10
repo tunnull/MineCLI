@@ -5,12 +5,14 @@ using System.IO;
 using CmlLib.Core.Installer.Forge.Versions;
 using System.Diagnostics;
 using System.Net;
-using static System.Net.Mime.MediaTypeNames;
+using System.Timers;
 
 
 //Global variables, mostly to control launching of Minecraft.
 MSession session = new MSession();
 string loader = "Vanilla";
+string version = "1.20.2";
+int minecraftPID = 0;
 Main();
 async void Main()
 {
@@ -19,48 +21,55 @@ async void Main()
     var loginHandler = CmlLib.Core.Auth.Microsoft.JELoginHandlerBuilder.BuildDefault();
     session = await loginHandler.Authenticate();
     //Start Up:
-    Console.WriteLine($"MineCLI Home - Loader: {loader}");
+    Console.WriteLine($"MineCLI Home - Loader: {loader} - Version: {version} - Running: {minecraftRunning(minecraftPID)}");
     Console.WriteLine("[~] Select ModLoader");
+    Console.WriteLine("[TAB] Select Version");
     Console.WriteLine("[1] Start Minecraft");
     Console.WriteLine("[2] Change Settings");
-    Console.WriteLine("[3] Open Mods Folder");
+    if (loader != "Vanilla")
+    {
+        Console.WriteLine($"[3] Open {loader} Mods Folder");
+    }
     Console.WriteLine("[0] Exit MineCLI");
     //Let user select option:
     ConsoleKeyInfo key = Console.ReadKey(true);
-    switch (key.KeyChar)
+    switch (key.Key)
     {
         //Start Minecraft:
-        case '1':
-            Console.Write("Input Minecraft version: ");
-            string version = Console.ReadLine();
-            if (version == null)
-            {
-                Console.WriteLine("Version name not provided. Not Launching.");
-                Main();
-            }
+        case ConsoleKey.D1:
             LaunchMinecraft(version);
+            Console.Clear();
             break;
             //Start Settings flow:
-        case '2':
+        case ConsoleKey.D2:
             WebClient client = new WebClient();
             client.DownloadFile("https://cdn.discordapp.com/attachments/1155528627451068506/1158352501590982686/mc_reaction.mp4", "IWasTooLazyToImplementThisnah s.mov");
             Process.Start("explorer.exe", "IWasTooLazyToImplementThisAt9AM.mov");
             break;
         //Open Mods folder for changing:
-        case '3':
-            WebClient client1 = new WebClient();
-            client1.DownloadFile("https://cdn.discordapp.com/attachments/1155528627451068506/1158352501590982686/mc_reaction.mp4", "IWasTooLazyToImplementThis.mov");
-            Process.Start("explorer.exe", "IWasTooLazyToImplementThisAt9AM.mov");
+        case ConsoleKey.D3:
+            string modPath = Path.Combine(Directory.GetCurrentDirectory().ToString(), $"loaderversions\\{loader}\\{version}\\mods");
+            Process.Start("explorer.exe",@modPath);
+            Console.Clear();
+            break;
+        case ConsoleKey.Tab:
+            Console.Write("Input Minecraft version: ");
+            version = Console.ReadLine();
+            if (version == null)
+            {
+                Console.WriteLine("Version name not provided. Not Launching.");
+            }
+            Console.Clear();
             break;
         //Exit MineCLI
-        case '0':
+        case ConsoleKey.D0:
             WebClient client2 = new WebClient();
             client2.DownloadFile("https://cdn.discordapp.com/attachments/1155528627451068506/1158352501590982686/mc_reaction.mp4", "coolExitOutro.mov");
             Process.Start("explorer.exe","coolExitOutro.mov");
             Environment.Exit(0);
             break;
-        case '`':
-        case '~':
+        case ConsoleKey.Oem8:
+        case ConsoleKey.Oem3:
             Console.WriteLine("Mod Loaders:");
             Console.WriteLine("[1] Vanilla (None)\n[2] Forge\n[3] Fabric");
             key = Console.ReadKey(true);
@@ -75,17 +84,18 @@ async void Main()
                 case '3':
                     loader = "Fabric";
                     break;
+                default: Console.Clear(); Console.WriteLine("Nothing selected, defaulting to last selected."); break;
 
             }
             Console.Clear();
-            Main();
             break;
         //Return if option isnt found:
         default:
-            Console.WriteLine("Invalid Option.. Returning to main screen.");
-            Main();
+            Console.Clear();
+            Console.WriteLine("Invalid Option.. Returned to main screen.");
             break;
     }
+    Main();
 }
 async Task LaunchMinecraft(string version)
 {
@@ -123,6 +133,7 @@ async Task LaunchVanilla(string version)
         Session = session
     });
     Minecraft.Start();
+    minecraftPID = Minecraft.Id;
 }
 async Task LaunchForge(string version)
 {
@@ -145,6 +156,7 @@ async Task LaunchForge(string version)
         Session = session
     });
     Minecraft.Start();
+    minecraftPID = Minecraft.Id;
 }
 async Task LaunchFabric(string version)
 {
@@ -167,4 +179,42 @@ async Task LaunchFabric(string version)
         Session = session
     });
     Minecraft.Start();
+    minecraftPID = Minecraft.Id;
+}
+void killMinecraft()
+{
+    if (minecraftRunning(minecraftPID) == true)
+    {
+        if (minecraftPID != 0)
+        {
+            Process minecraft = Process.GetProcessById(minecraftPID);
+            minecraft.Kill();
+        }
+        else
+        {
+        }
+    }
+    else
+    {
+    }
+}
+static bool minecraftRunning(int id)
+{
+    try
+    {
+        Process.GetProcessById(id);
+    }
+    catch (InvalidOperationException)
+    {
+        return false;
+    }
+    catch (ArgumentException)
+    {
+        return false;
+    }
+    if (id == 0)
+    {
+        return false;
+    }
+    return true;
 }
