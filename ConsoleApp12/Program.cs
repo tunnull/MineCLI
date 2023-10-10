@@ -43,7 +43,7 @@ async void Main()
             //Start Settings flow:
         case '2':
             WebClient client = new WebClient();
-            client.DownloadFile("https://cdn.discordapp.com/attachments/1155528627451068506/1158352501590982686/mc_reaction.mp4", "IWasTooLazyToImplementThis.mov");
+            client.DownloadFile("https://cdn.discordapp.com/attachments/1155528627451068506/1158352501590982686/mc_reaction.mp4", "IWasTooLazyToImplementThisnah s.mov");
             Process.Start("explorer.exe", "IWasTooLazyToImplementThisAt9AM.mov");
             break;
         //Open Mods folder for changing:
@@ -126,7 +126,7 @@ async Task LaunchVanilla(string version)
 }
 async Task LaunchForge(string version)
 {
-    MinecraftPath path = new MinecraftPath($"launcherversions/forge/{version}");
+    MinecraftPath path = new MinecraftPath($"loaderversions/forge/{version}");
     CMLauncher launcher = new CMLauncher(path);
     var forge = new CmlLib.Core.Installer.Forge.MForge(launcher);
     var versionList = new ForgeVersionLoader(new HttpClient());
