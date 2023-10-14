@@ -43,8 +43,8 @@ async void Main()
             //Start Settings flow:
         case ConsoleKey.D2:
             WebClient client = new WebClient();
-            client.DownloadFile("https://cdn.discordapp.com/attachments/1155528627451068506/1158352501590982686/mc_reaction.mp4", "IWasTooLazyToImplementThisnah s.mov");
-            Process.Start("explorer.exe", "IWasTooLazyToImplementThisAt9AM.mov");
+            client.DownloadFile("https://cdn.discordapp.com/attachments/1155528627451068506/1158352501590982686/mc_reaction.mp4", "IWasTooLazyToImplementThis.mov");
+            Process.Start("explorer.exe", "IWasTooLazyToImplementThis.mov");
             break;
         //Open Mods folder for changing:
         case ConsoleKey.D3:
